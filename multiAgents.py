@@ -154,7 +154,35 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def minimax(agent, depth, gameState):
+            #return if we win or lose and check for depth
+            if gameState.isWin() or gameState.isLose() or depth == self.depth: 
+                return self.evaluationFunction(gameState)
+            #as agent =0 is pacman, we maximize for it.    
+            if agent == 0:  
+                #I set the agent to 1 which are the ghosts as we have just 1 pacman
+                return max(minimax(1, depth, gameState.generateSuccessor(agent, nextState)) for nextState in gameState.getLegalActions(agent))
+            #And we will minimize it for the ghosts
+            else:  
+                #We check if we have checked for all the ghosts at that depth
+                totalAgent = agent + 1  
+                if gameState.getNumAgents() == totalAgent:
+                    totalAgent = 0 # setting it back for pacman when we have checked for all the ghosts
+                    depth+=1
+                #This continues until we have all ghosts calculated for and that is when I increase the depth
+                return min(minimax(totalAgent, depth, gameState.generateSuccessor(agent, nextState)) for nextState in gameState.getLegalActions(agent))
+
+        #Now we calculate it for our agent at depth 0 for maximum, after we start from the least value possible.
+        maximum = float("-inf")
+        for State in gameState.getLegalActions(0):
+            #As we have are checkking for pacman so our agent is 0 and we check for maximum utility
+            utility = minimax(1, 0, gameState.generateSuccessor(0, State))
+            if utility > maximum:
+                maximum = utility
+                actionState = State
+
+        return actionState
+       
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """

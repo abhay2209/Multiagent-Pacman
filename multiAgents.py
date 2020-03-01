@@ -193,7 +193,69 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
+        return self.alphaBetaPruner(gameState, 0, 0, float("-inf"),float("inf"))
+
+    def alphaBetaPruner (self, gameState, agentIndex, depth, alpha, beta):
+
+        if agentIndex >= gameState.getNumAgents():
+            agentIndex = 0
+            depth += 1
+
+        if gameState.isWin() or gameState.isLose() or depth == self.depth:
+            return self.evaluationFunction(gameState)
+
+        if agentIndex == self.index:
+            return self.max_value(gameState, agentIndex, depth, alpha, beta)
+        else:
+            return self.min_value(gameState, agentIndex, depth, alpha, beta)
+
         
+
+    def max_value(self, gameState, agentIndex, depth, alpha, beta):
+      #Initialize v as -infinity
+      v = float("-inf")
+      #calculating legal actions to get successor state
+      for legalActions in gameState.getLegalActions(agentIndex):
+        if legalActions == Directions.STOP:
+          continue
+        #Getting successor states
+        successorState = gameState.generateSuccessor(agentIndex, legalActions)
+        current = self.alphaBetaPruner(successorState, agentIndex+1, depth, alpha, beta)
+        #v=max value
+        if current > v:
+          v = current
+          actionValue = legalActions
+        #As from piaza we keep looping around until we ind a value more than a particular beta or we run out of succesor states
+        if v > beta:
+          return v
+
+        alpha = max(alpha, v)
+
+      if depth == 0:
+        return actionValue
+      else:
+        return v
+
+    def min_value(self, gameState, agentIndex, depth, alpha, beta):
+       #Initialize v as +infinity
+      v = float("inf")
+      #calculating legal actions to get successor state
+      for legalActions in gameState.getLegalActions(agentIndex):
+        if legalActions == Directions.STOP:
+          continue
+        #Getting successor states
+        successorState = gameState.generateSuccessor(agentIndex, legalActions)
+        current = self.alphaBetaPruner(successorState, agentIndex+1, depth, alpha, beta)
+        #v=min value
+        if current < v:
+          v = current
+          actionValue = legalActions
+        #As from piaza we keep looping around until we ind a value less than a particular alpha or we run out of succesor states
+        if v < alpha:
+          return v
+        beta = min (beta,v)
+      return v
+
 
   
       

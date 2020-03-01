@@ -193,7 +193,10 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+
+  
+      
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
@@ -245,7 +248,38 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    newPos = currentGameState.getPacmanPosition()
+    #print(newPos)
+    newFood = currentGameState.getFood()
+    #print(newFood)
+    newGhostStates = currentGameState.getGhostStates()
+    #print(newGhostStates)
+    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+    #assigning a weight to everything, food and ghost has same weight and ofc weight of a scared ghost will be more
+    foodWeight = 1.0
+    ghostWeight = 1.0
+    scaredGhostWeight = 2.0
+
+    #From this total score I will subtract or add according to movement I want to follow
+    totalScore = currentGameState.getScore()
+
+    for ghost in newGhostStates:
+        distance = manhattanDistance(newPos, newGhostStates[0].getPosition())
+        if distance > 0:
+            #if the ghost is scared, eat it
+            if ghost.scaredTimer > 0:  
+                totalScore += scaredGhostWeight/distance
+            # if it is not scared, go away    
+            else:
+                totalScore -= ghostWeight/distance
+    
+
+    # Now we find distacne to the closest food
+    distancesToFood = [manhattanDistance(newPos, x) for x in newFood.asList()]
+    if len(distancesToFood):
+        totalScore += foodWeight / min(distancesToFood)
+
+    return totalScore
 
 # Abbreviation
 better = betterEvaluationFunction
